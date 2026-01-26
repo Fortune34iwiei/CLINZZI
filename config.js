@@ -1,3 +1,3 @@
 // Keep this external for security
-export const TELEGRAM_TOKEN = "7781718948:AAF90lWhR0vfih40-foHBSDjGTcB4HRC64A";
-export const TELEGRAM_CHAT_ID = "7829354744";
+export const TELEGRAM_TOKEN = "8569288017:AAFzaz62IZOlKJVp5uqOsuppV7E_YivSgdU";
+export const TELEGRAM_CHAT_ID = "5823343134";
